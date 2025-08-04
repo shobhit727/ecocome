@@ -1,4 +1,13 @@
-# models.py
+# ==============================================
+# Market Data Models
+# ==============================================
+# This module defines the core data models for the trading system:
+# - Company: Represents listed companies and their stock details
+# - Trader: Represents market participants and their portfolios
+# - Order: Represents buy/sell orders in the market
+# - Trade: Represents executed trades between buyers and sellers
+# ==============================================
+
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Dict, List, Optional

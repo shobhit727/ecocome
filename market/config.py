@@ -1,4 +1,23 @@
-# config.py
+# ==============================================
+# Market Configuration
+# ==============================================
+# Central configuration for the trading system:
+#
+# Trading Settings:
+# - Trading fees and fee structure
+# - Market simulation parameters
+# - Price fluctuation ranges
+#
+# System Settings:
+# - API host and port
+# - Update intervals
+#
+# Sample Data:
+# - Initial companies and stocks
+# - Sample trader accounts
+# ==============================================
+
+
 class Settings:
     # Trading fees (percentage of trade value)
     TRADING_FEE_PERCENT = 0.1  # 0.1% fee

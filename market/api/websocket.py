@@ -1,4 +1,13 @@
-# api/websocket.py
+# ==============================================
+# WebSocket Connection Manager
+# ==============================================
+# This module handles real-time market data broadcasting:
+# - Manages WebSocket connections from clients
+# - Broadcasts market updates to all connected clients
+# - Handles connection/disconnection events
+# - Maintains list of active connections
+# ==============================================
+
 from fastapi import WebSocket
 from typing import List
 

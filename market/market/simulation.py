@@ -1,4 +1,15 @@
-# market/simulation.py
+# ==============================================
+# Market Simulation Module
+# ==============================================
+# This module handles the market simulation features:
+# - Simulates price movements for all stocks
+# - Processes pending orders in the order book
+# - Broadcasts real-time market updates via WebSocket
+#
+# Price updates occur every MARKET_UPDATE_INTERVAL seconds
+# with fluctuations within PRICE_FLUCTUATION_RANGE
+# ==============================================
+
 import random
 import asyncio
 from datetime import datetime

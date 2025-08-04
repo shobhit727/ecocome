@@ -1,4 +1,19 @@
-# market/fees.py
+# ==============================================
+# Trading Fee Calculator
+# ==============================================
+# Handles all fee-related calculations:
+# - Calculates trading fees based on trade value
+# - Uses TRADING_FEE_PERCENT from settings
+# - Splits fees between buyer and seller
+# - Currently uses same fee for both parties
+#
+# Fee Structure:
+# - Base fee: TRADING_FEE_PERCENT of trade value
+# - Buyer pays: base fee
+# - Seller pays: base fee
+# ==============================================
+
+from typing import Dict
 from ..config import settings
 
 

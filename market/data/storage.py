@@ -1,3 +1,15 @@
+# ==============================================
+# Market Data Storage System
+# ==============================================
+# Central data storage for the trading system:
+# - Companies: Stores registered companies and their stocks
+# - Traders: Manages trader accounts and portfolios
+# - Order Book: Tracks all pending buy/sell orders
+# - Trade History: Records all executed trades
+#
+# Uses asyncio.Lock for thread-safe operations
+# ==============================================
+
 import asyncio
 from models import Company, Trader, Order, Trade
 from config import settings

@@ -1,3 +1,14 @@
+# ==============================================
+# Data Initialization Module
+# ==============================================
+# Initializes the market with sample data:
+# - Creates sample companies with initial stock prices
+# - Sets up empty order books for each company
+# - Creates sample traders with initial cash/portfolios
+#
+# All sample data is configured in settings.py
+# ==============================================
+
 import uuid
 from config import settings
 from models import Company, Trader
