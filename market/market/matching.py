@@ -1,6 +1,141 @@
-# market/matching.py
-import uuid
+# ==============================================
+# Order Matching Module
+# ==============================================
+# This module handles order matching and trade execution:
+# - Matches buy/sell orders based on price priority
+# - Executes trades between matched orders
+# - Updates trader portfolios and balances
+# - Records trade history
+# ==============================================
+
 from datetime import datetime
+import uuid
+from ..models import Trade, Order
+from ..data import storage
+from .fees import calculate_trading_fees
+
+
+async def execute_trade(
+    buyer_id: str, seller_id: str, symbol: str, price: float, quantity: int
+) -> Trade:
+    """Execute a trade between buyer and seller with fees"""
+    async with storage.data_store.lock:
+        # Get references to traders
+        buyer = storage.data_store.traders[buyer_id]
+        seller = storage.data_store.traders[seller_id]
+
+        # Calculate trade value and fees
+        trade_value = price * quantity
+        fees = calculate_trading_fees(trade_value)
+
+        # Update buyer portfolio (pay price + fees)
+        buyer.portfolio[symbol] = buyer.portfolio.get(symbol, 0) + quantity
+        buyer.cash -= trade_value + fees["buyer_fee"]
+
+        # Update seller portfolio (receive price - fees)
+        seller.portfolio[symbol] = seller.portfolio.get(symbol, 0) - quantity
+        seller.cash += trade_value - fees["seller_fee"]
+
+        # Record trade
+        trade = Trade(
+            trade_id=str(uuid.uuid4()),
+            symbol=symbol,
+            price=price,
+            quantity=quantity,
+            buyer=buyer_id,
+            seller=seller_id,
+            fees=fees,
+            timestamp=datetime.now()
+        )
+        storage.data_store.trade_history.append(trade)
+
+        return trade
+
+
+async def match_orders():
+    """Match buy and sell orders in the order book"""
+    data_store = storage.data_store
+    for symbol in list(data_store.order_book.keys()):
+        if symbol not in data_store.order_book:
+            continue
+            
+        async with data_store.lock:
+            # Sort orders by price priority
+            buy_orders = sorted(
+                data_store.order_book[symbol]["buy"],
+                key=lambda x: x.price,
+                reverse=True
+            )
+            sell_orders = sorted(
+                data_store.order_book[symbol]["sell"],
+                key=lambda x: x.price
+            )
+
+            # Match orders while possible
+            while buy_orders and sell_orders:
+                buy = buy_orders[0]
+                sell = sell_orders[0]
+                
+                if buy.price >= sell.price:
+                    # Execute trade at seller's price
+                    quantity = min(buy.quantity, sell.quantity)
+                    await execute_trade(
+                        buy.trader_id,
+                        sell.trader_id,
+                        symbol,
+                        sell.price,
+                        quantity
+                    )
+                    
+                    # Update or remove orders
+                    buy.quantity -= quantity
+                    sell.quantity -= quantity
+                    
+                    if buy.quantity == 0:
+                        buy_orders.pop(0)
+                        data_store.order_book[symbol]["buy"].remove(buy)
+                    if sell.quantity == 0:
+                        sell_orders.pop(0)
+                        data_store.order_book[symbol]["sell"].remove(sell)
+                else:
+                    break  # No more matches possible
+            # Sort orders by price priority
+            buy_orders = sorted(
+                data_store.order_book[symbol]["buy"],
+                key=lambda x: x.price,
+                reverse=True
+            )
+            sell_orders = sorted(
+                data_store.order_book[symbol]["sell"],
+                key=lambda x: x.price
+            )
+
+            # Match orders while possible
+            while buy_orders and sell_orders:
+                buy = buy_orders[0]
+                sell = sell_orders[0]
+                
+                if buy.price >= sell.price:
+                    # Execute trade at seller's price
+                    quantity = min(buy.quantity, sell.quantity)
+                    await execute_trade(
+                        buy.trader_id,
+                        sell.trader_id,
+                        symbol,
+                        sell.price,
+                        quantity
+                    )
+                    
+                    # Update or remove orders
+                    buy.quantity -= quantity
+                    sell.quantity -= quantity
+                    
+                    if buy.quantity == 0:
+                        buy_orders.pop(0)
+                    if sell.quantity == 0:
+                        sell_orders.pop(0)
+                else:
+                    break  # No more matches possible datetime
 from ..models import Trade
 from ..data import storage
 from .fees import calculate_trading_fees
@@ -49,6 +184,8 @@ async def match_orders():
     for symbol in list(data_store.order_book.keys()):
         if symbol not in data_store.order_book:
             continue
+            
+        async with data_store.lock:
 
         # Sort orders by price priority
         buy_orders = sorted(

@@ -44,3 +44,8 @@ class Trade(BaseModel):
     seller: str
     fees: Dict[str, float]  # {'buyer_fee': 1.5, 'seller_fee': 1.5}
     timestamp: datetime
+    portfolio: Dict[str, int] = {}
+    performance_history: List[Dict[str, float]] = (
+        []
+    )  # [{timestamp, portfolio_value, return}]
+    active: bool = True

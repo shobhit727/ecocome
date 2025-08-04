@@ -1,5 +1,15 @@
-# api/endpoints.py
+# ==============================================
+# API Endpoints
+# ==============================================
+# REST API endpoints for:
+# - Company management
+# - Trader operations
+# - Market operations
+# - AI trading control
+# ==============================================
+
 from fastapi import APIRouter, HTTPException, status
+from typing import Dict, List
 from ..models import Company, Trader, Order, Trade
 from ..data import storage
 from ..market.fees import calculate_trading_fees

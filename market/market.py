@@ -1,7 +1,20 @@
 # =====================
 # IMPORTS
+# =====================# =====================
+# WEBSOCKET MANAGER
 # =====================
-from fastapi import FastAPI, HTTPException, WebSocket, status
+from fastapi.websockets import WebSocketDisconnect
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket) import FastAPI, HTTPException, WebSocket, status
 from pydantic import BaseModel
 import random
 import asyncio
